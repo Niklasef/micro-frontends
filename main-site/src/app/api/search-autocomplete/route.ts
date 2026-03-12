@@ -14,16 +14,44 @@ const ALL_ITEMS = [
   "Coffee Mug",
 ];
 
+const MOCK_RECENT_ORDERS = [
+  {
+    id: "ord-1001",
+    title: "Coffee Mug",
+    subtitle: "Ordered 2 days ago",
+  },
+  {
+    id: "ord-1002",
+    title: "Camping Bag",
+    subtitle: "Ordered 1 week ago",
+  },
+  {
+    id: "ord-1003",
+    title: "Product B",
+    subtitle: "Ordered 3 weeks ago",
+  },
+];
+
 export async function GET(req: NextRequest) {
   const q = req.nextUrl.searchParams.get("q")?.trim().toLowerCase() || "";
 
   if (!q) {
-    return NextResponse.json({ suggestions: [] });
+    return NextResponse.json({
+      suggestions: [],
+      recentOrders: [],
+    });
   }
 
   const suggestions = ALL_ITEMS.filter((item) =>
     item.toLowerCase().includes(q)
   ).slice(0, 5);
 
-  return NextResponse.json({ suggestions });
+  const recentOrders = MOCK_RECENT_ORDERS.filter((order) =>
+    order.title.toLowerCase().includes(q)
+  ).slice(0, 3);
+
+  return NextResponse.json({
+    suggestions,
+    recentOrders,
+  });
 }
