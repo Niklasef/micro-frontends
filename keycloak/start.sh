@@ -93,7 +93,7 @@ docker exec "$CONTAINER_NAME" /opt/keycloak/bin/kcadm.sh set-password \
   -r "$REALM" \
   --userid "$USER_ID" \
   --new-password "$DEMO_PASSWORD" \
-  --temporary false >/dev/null
+  --temporary=false >/dev/null
 
 echo
 echo "Keycloak started."
