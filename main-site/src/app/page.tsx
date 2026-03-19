@@ -115,8 +115,27 @@ export default function Home() {
                 setTimeout(() => setOpen(false), 120);
               }}
               placeholder="Search…"
-              className="w-full border rounded-md px-3 py-2 text-sm bg-white outline-none focus:ring-2 focus:ring-zinc-200"
+              className="w-full border rounded-md px-3 py-2 text-sm bg-white outline-none focus:ring-2 focus:ring-zinc-200 pr-10"
             />
+            {query && (
+              <button
+                type="button"
+                aria-label="Clear search"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-700 p-1"
+                onMouseDown={e => e.preventDefault()}
+                onClick={() => {
+                  setQuery("");
+                  setFiltered([]);
+                  setRecentOrders([]);
+                  setOpen(false);
+                }}
+                tabIndex={-1}
+              >
+                <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
+                  <path d="M6 6l8 8M6 14L14 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+              </button>
+            )}
 
             {open && (loading || hasResults) && (
               <div className="absolute mt-2 w-full rounded-md border bg-white shadow-lg overflow-hidden z-20">
