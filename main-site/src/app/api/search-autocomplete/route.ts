@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getServerSession } from "next-auth";
+import { authOptions } from "../auth/[...nextauth]/route";
 
 const ALL_ITEMS = [
   "Product A",
@@ -42,13 +44,17 @@ export async function GET(req: NextRequest) {
     });
   }
 
+  const session = await getServerSession(authOptions);
+
   const suggestions = ALL_ITEMS.filter((item) =>
     item.toLowerCase().includes(q)
   ).slice(0, 5);
 
-  const recentOrders = MOCK_RECENT_ORDERS.filter((order) =>
-    order.title.toLowerCase().includes(q)
-  ).slice(0, 3);
+  const recentOrders = session
+    ? MOCK_RECENT_ORDERS.filter((order) =>
+        order.title.toLowerCase().includes(q)
+      ).slice(0, 3)
+    : [];
 
   return NextResponse.json({
     suggestions,
