@@ -1,19 +1,13 @@
-import { SignJWT, jwtVerify, type JWTPayload } from "jose";
+import { jwtVerify, createRemoteJWKSet, type JWTPayload } from "jose";
+import { URL } from "node:url";
 
-const secret = new TextEncoder().encode(process.env.JWT_SECRET ?? "dev-secret");
-
-export async function signToken(
-  payload: JWTPayload,
-  expiresIn: string | number = "1h",
-): Promise<string> {
-  return await new SignJWT(payload)
-    .setProtectedHeader({ alg: "HS256" })
-    .setIssuedAt()
-    .setExpirationTime(expiresIn)
-    .sign(secret);
-}
+const issuer = process.env.KEYCLOAK_ISSUER!;
+const JWKS = createRemoteJWKSet(new URL(`${issuer}/protocol/openid-connect/certs`));
 
 export async function verifyToken<T extends JWTPayload = JWTPayload>(token: string): Promise<T> {
-  const { payload } = await jwtVerify<T>(token, secret);
+  const { payload } = await jwtVerify<T>(token, JWKS, {
+    issuer,
+    audience: process.env.KEYCLOAK_CLIENT_ID,
+  });
   return payload;
 }

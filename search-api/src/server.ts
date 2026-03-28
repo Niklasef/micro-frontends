@@ -1,3 +1,4 @@
+import "./env.js";               // load .env / .env.local first
 import Fastify from "fastify";
 import searchAutocompleteRoute from "./routes/searchAutocomplete.js";
 
