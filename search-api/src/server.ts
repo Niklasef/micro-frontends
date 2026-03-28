@@ -1,10 +1,11 @@
 import Fastify from "fastify";
+import searchAutocompleteRoute from "./routes/searchAutocomplete.js";
 
 const server = Fastify({
   logger: true,
 });
 
-// no routes yet – endpoints will be added later
+server.register(searchAutocompleteRoute);
 
 async function start() {
   try {
