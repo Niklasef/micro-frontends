@@ -41,7 +41,7 @@ export default function App() {
         setLoading(true);
 
         const res = await fetch(
-          `/api/search-autocomplete?q=${encodeURIComponent(q)}`,
+          `/api/proxy?path=search-autocomplete&q=${encodeURIComponent(q)}`,
           {
             method: "GET",
             signal: controller.signal,

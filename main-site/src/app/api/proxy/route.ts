@@ -23,8 +23,16 @@ async function handler(request: NextRequest) {
     );
   }
 
-  // Ensure we don’t end up with double slashes.
-  const targetUrl = `${BACKEND_BASE}/${path.replace(/^\/+/, "")}`;
+  // Build upstream URL and forward *all* remaining query-params
+  const baseTarget = `${BACKEND_BASE}/${path.replace(/^\/+/, "")}`;
+
+  const forwardParams = new URLSearchParams(url.searchParams);
+  forwardParams.delete("path"); // don’t forward our control param
+
+  const targetUrl =
+    forwardParams.toString() === ""
+      ? baseTarget
+      : `${baseTarget}?${forwardParams.toString()}`;
 
   // Clone headers so we can add auth information
   const headers = new Headers(request.headers);
