@@ -50,14 +50,24 @@ const searchAutocompleteRoute: FastifyPluginAsync = async (fastify) => {
     let recentOrders: typeof MOCK_RECENT_ORDERS = [];
 
     const authHeader = request.headers.authorization;
+
+    if (!authHeader) {
+      fastify.log.info("No Authorization header supplied");
+    }
+
     if (authHeader?.startsWith("Bearer ")) {
       const token = authHeader.slice("Bearer ".length);
+      fastify.log.info({ token }, "Received bearer token");
+
       try {
-        await verifyToken(token);
+        const payload = await verifyToken(token);
+        fastify.log.info({ sub: payload.sub, exp: payload.exp }, "Token verified successfully");
+
         recentOrders = MOCK_RECENT_ORDERS.filter((order) =>
           order.title.toLowerCase().includes(q),
         ).slice(0, 3);
-      } catch {
+      } catch (err) {
+        fastify.log.warn({ err }, "Token verification failed");
         // invalid / expired token – treat as unauthenticated
       }
     }
