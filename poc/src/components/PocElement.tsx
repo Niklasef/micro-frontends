@@ -10,7 +10,17 @@ export default function PocElement({ children }: { children: ReactNode }) {
   /* register the element on first client render */
   useEffect(() => {
     if (typeof window !== "undefined" && !customElements.get("poc-element")) {
-      class PocElementEl extends HTMLElement {}
+      class PocElementEl extends HTMLElement {
+        connectedCallback() {
+          if (this.shadowRoot) return;
+
+          /* create open shadow-root and move existing children into it */
+          const shadow = this.attachShadow({ mode: "open" });
+          while (this.firstChild) {
+            shadow.appendChild(this.firstChild);
+          }
+        }
+      }
       customElements.define("poc-element", PocElementEl);
     }
   }, []);
