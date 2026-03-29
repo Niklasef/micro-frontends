@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
 
 const BACKEND_BASE = "http://127.0.0.1:3001";
 
@@ -25,10 +26,22 @@ async function handler(request: NextRequest) {
   // Ensure we don’t end up with double slashes.
   const targetUrl = `${BACKEND_BASE}/${path.replace(/^\/+/, "")}`;
 
+  // Clone headers so we can add auth information
+  const headers = new Headers(request.headers);
+
+  // Attach the user's session token (if any) as a Bearer auth header
+  const token = await getToken({ req: request }); // decoded object, not raw
+  const accessToken = token?.accessToken as string | undefined;
+  console.log("token", token);
+  
+  if (accessToken) {
+    headers.set("Authorization", `Bearer ${accessToken}`);
+  }
+
   // Clone the request so we can safely read the body for non-GET methods
   const init: RequestInit = {
     method: request.method,
-    headers: request.headers,
+    headers,
   };
 
   if (!["GET", "HEAD"].includes(request.method)) {

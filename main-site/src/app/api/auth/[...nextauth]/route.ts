@@ -12,6 +12,21 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
+  callbacks: {
+    async jwt({ token, account }) {
+      // On sign-in, persist Keycloak tokens into the encrypted Auth.js JWT
+      if (account?.access_token) {
+        token.accessToken = account.access_token;
+      }
+      if (account?.refresh_token) {
+        token.refreshToken = account.refresh_token;
+      }
+      if (account?.expires_at) {
+        token.accessTokenExpires = account.expires_at;
+      }
+      return token;
+    },
+  },
 };
 
 const handler = NextAuth(authOptions);
