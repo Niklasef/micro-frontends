@@ -16,6 +16,9 @@
   "devDependencies": {
     "@types/react": "latest",
     "@types/node": "latest",
-    "typescript": "latest"
+    "typescript": "latest",
+    "tailwindcss": "3.4.4",
+    "postcss": "latest",
+    "autoprefixer": "latest"
   }
 }
