@@ -1,5 +1,6 @@
 import { defineConfig } from "astro/config";
+import react from "@astrojs/react";
 
 export default defineConfig({
-  // Add integrations and custom config here
+  integrations: [react()],
 });

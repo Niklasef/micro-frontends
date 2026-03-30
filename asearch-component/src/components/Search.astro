@@ -1,0 +1,148 @@
+---
+// No props required
+---
+
+<div class="relative w-72" style="font-family: sans-serif;">
+  <input
+    id="search-input"
+    type="text"
+    placeholder="Search…"
+    class="w-full border rounded-md px-3 py-2 text-sm bg-white outline-none focus:ring-2 focus:ring-zinc-200"
+    autocomplete="off"
+  />
+
+  <div
+    id="search-dropdown"
+    class="absolute mt-2 w-full rounded-md border bg-white shadow-lg overflow-hidden z-20 hidden"
+  >
+    <div
+      id="dropdown-header"
+      class="px-3 py-2 text-xs text-zinc-500 bg-zinc-50 border-b"
+    >
+      Suggestions
+    </div>
+
+    <div id="dropdown-body" class="max-h-80 overflow-auto"></div>
+  </div>
+</div>
+
+<script type="module">
+  /* --------------------------------------------
+   * Native-JS search-autocomplete (Astro island)
+   * ------------------------------------------ */
+
+  const root = document.currentScript.parentElement;
+  const input = root.querySelector("#search-input");
+  const dropdown = root.querySelector("#search-dropdown");
+  const body = root.querySelector("#dropdown-body");
+  const header = root.querySelector("#dropdown-header");
+
+  let abortCtrl = null;
+  let timer = null;
+
+  input.addEventListener("input", () => {
+    const q = input.value.trim();
+    showDropdown();
+
+    clearTimeout(timer);
+    timer = setTimeout(() => fetchSuggestions(q), 300);
+  });
+
+  input.addEventListener("focus", showDropdown);
+  input.addEventListener("blur", () => setTimeout(hideDropdown, 120));
+
+  function showDropdown() {
+    dropdown.classList.remove("hidden");
+  }
+  function hideDropdown() {
+    dropdown.classList.add("hidden");
+  }
+
+  async function fetchSuggestions(q) {
+    if (!q) {
+      body.innerHTML = "";
+      header.textContent = "Suggestions";
+      return;
+    }
+
+    abortCtrl?.abort();
+    abortCtrl = new AbortController();
+    header.textContent = "Searching…";
+
+    try {
+      const res = await fetch(
+        `/api/proxy?path=search-autocomplete&q=${encodeURIComponent(q)}`,
+        { signal: abortCtrl.signal }
+      );
+
+      if (!res.ok) throw new Error("Request failed");
+      const { suggestions = [], recentOrders = [] } = await res.json();
+
+      renderResults(suggestions, recentOrders);
+    } catch (err) {
+      if (err.name !== "AbortError") {
+        console.error(err);
+        body.innerHTML = "";
+      }
+    } finally {
+      header.textContent = "Suggestions";
+    }
+  }
+
+  function renderResults(suggestions, recentOrders) {
+    const parts = [];
+
+    if (Array.isArray(suggestions) && suggestions.length) {
+      parts.push(`<ul>
+        ${suggestions
+          .map(
+            (s) => `<li>
+              <button type="button"
+                class="w-full text-left px-3 py-2 text-sm hover:bg-zinc-100"
+                data-value="${encodeHTML(s)}">${encodeHTML(s)}</button>
+            </li>`
+          )
+          .join("")}
+      </ul>`);
+    }
+
+    if (Array.isArray(recentOrders) && recentOrders.length) {
+      parts.push(`
+        <div class="border-t"></div>
+        <div class="px-3 py-2 text-xs text-zinc-500 bg-zinc-50 border-b">
+          Your latest orders
+        </div>
+        <ul>
+          ${recentOrders
+            .map(
+              (o) => `<li>
+                <button type="button"
+                  class="w-full text-left px-3 py-3 hover:bg-zinc-100"
+                  data-value="${encodeHTML(o.title)}">
+                  <div class="text-sm font-medium text-zinc-900">${encodeHTML(
+                    o.title
+                  )}</div>
+                  <div class="text-xs text-zinc-500 mt-0.5">${encodeHTML(
+                    o.subtitle
+                  )}</div>
+                </button>
+              </li>`
+            )
+            .join("")}
+        </ul>`);
+    }
+
+    body.innerHTML = parts.join("") || "";
+    body.querySelectorAll("button[data-value]").forEach((btn) => {
+      btn.addEventListener("mousedown", (e) => e.preventDefault());
+      btn.addEventListener("click", () => {
+        input.value = btn.dataset.value;
+        hideDropdown();
+      });
+    });
+  }
+
+  function encodeHTML(str) {
+    return str.replace(/[&<>"']/g, (m) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
+  }
+</script>
