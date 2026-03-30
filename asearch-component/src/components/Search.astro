@@ -2,7 +2,7 @@
 // No props required
 ---
 
-<div class="relative w-72" style="font-family: sans-serif;">
+<div data-search-root class="relative w-72" style="font-family: sans-serif;">
   <input
     id="search-input"
     type="text"
@@ -30,8 +30,12 @@
   /* --------------------------------------------
    * Native-JS search-autocomplete (Astro island)
    * ------------------------------------------ */
+  console.info("[Search] inline script loaded – JS is executing in the browser");
 
-  const root = document.currentScript.parentElement;
+  /* find the component’s root element even if the script was hoisted */
+  const root =
+    document.currentScript?.closest("[data-search-root]") ||
+    document.querySelector("[data-search-root]");
   const input = root.querySelector("#search-input");
   const dropdown = root.querySelector("#search-dropdown");
   const body = root.querySelector("#dropdown-body");
@@ -40,13 +44,17 @@
   let abortCtrl = null;
   let timer = null;
 
-  input.addEventListener("input", () => {
+  const handleInput = () => {
     const q = input.value.trim();
     showDropdown();
 
     clearTimeout(timer);
     timer = setTimeout(() => fetchSuggestions(q), 300);
-  });
+  };
+
+  /* use both 'input' and 'keyup' to be extra-sure we catch typing */
+  input.addEventListener("input", handleInput);
+  input.addEventListener("keyup", handleInput);
 
   input.addEventListener("focus", showDropdown);
   input.addEventListener("blur", () => setTimeout(hideDropdown, 120));
@@ -70,10 +78,12 @@
     header.textContent = "Searching…";
 
     try {
+      console.debug("[Search] fetching suggestions for:", q);
       const res = await fetch(
         `/api/proxy?path=search-autocomplete&q=${encodeURIComponent(q)}`,
         { signal: abortCtrl.signal }
       );
+      console.debug("[Search] response status:", res.status);
 
       if (!res.ok) throw new Error("Request failed");
       const { suggestions = [], recentOrders = [] } = await res.json();
