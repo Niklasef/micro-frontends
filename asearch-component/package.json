@@ -1,0 +1,19 @@
+{
+  "name": "asearch-component",
+  "private": true,
+  "type": "module",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "clean": "rm -rf dist node_modules"
+  },
+  "dependencies": {
+    "astro": "^4.7.0"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
