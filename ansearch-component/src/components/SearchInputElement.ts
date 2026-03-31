@@ -1,32 +1,38 @@
 /**
- * Minimal definition of the <search-input> custom element.
+ * Minimal definition of the <search-input> custom element using
+ * Declarative Shadow DOM (DSD).
  *
- * • No styles and no Shadow DOM are used (the input stays in light-DOM).
- * • If the author placed an <input> inside the element the component
- *   leaves it untouched. Otherwise one is created automatically.
+ * • On the server we emit a <template shadowroot="open"> (see
+ *   SearchInput.astro). Browsers that support DSD will upgrade it
+ *   automatically, giving us a populated `shadowRoot` when
+ *   connectedCallback runs.
+ *
+ * • On browsers that do NOT support DSD (e.g. Safari), `shadowRoot`
+ *   will be undefined. We detect that case, find the template and
+ *   attach the shadow root manually to replicate the same markup.
  */
 class SearchInputElement extends HTMLElement {
-  /** guard so connectedCallback only runs once */
-  private _initialised = false;
-
   connectedCallback() {
-    if (this._initialised) return;
-    this._initialised = true;
+    if (this.shadowRoot) return;
 
-    // Ensure there is exactly one <input type="search"> child
-    let input = this.querySelector("input");
-    if (!input) {
-      input = document.createElement("input");
-      input.type = "search";
-      input.placeholder = "Search…";
-      this.appendChild(input);
-    } else if (input instanceof HTMLInputElement) {
-      input.type = "search";
+    const template = this.querySelector<HTMLTemplateElement>(
+      "template[shadowrootmode]"
+    );
+
+    if (template) {
+      const mode = (template.getAttribute("shadowrootmode") ?? "open") as
+        | "open"
+        | "closed";
+
+      const shadow = this.attachShadow({ mode });
+      shadow.appendChild(template.content.cloneNode(true));
+
+      // optional: remove inert fallback template after cloning
+      template.remove();
     }
   }
 }
 
-// Register once, even if this script is executed multiple times.
 if (!customElements.get("search-input")) {
   customElements.define("search-input", SearchInputElement);
 }

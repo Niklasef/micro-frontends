@@ -1,7 +1,13 @@
 ---
 ---
-<!-- A super-minimal Astro component exposing the input wrapped inside
-     an (as-yet) unregistered custom element -->
+<!--
+  A super-minimal Astro component that server-side renders a declarative
+  Shadow DOM (DSD) for <search-input>. Browsers that support DSD will
+  automatically attach the shadow-root. Others will be upgraded by the
+  runtime in SearchInputElement.ts.
+-->
 <search-input>
-  <input type="search" placeholder="Search…" />
+  <template shadowrootmode="open">
+    <input type="search" placeholder="Search…" />
+  </template>
 </search-input>
