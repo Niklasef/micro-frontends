@@ -32,6 +32,13 @@
    * ------------------------------------------ */
   console.info("[Search] inline script loaded – JS is executing in the browser");
 
+  /* register <search-box> as a custom element (no shadow-DOM) */
+  const TAG_NAME = "search-box";
+  if (!customElements.get(TAG_NAME)) {
+    class SearchBoxElement extends HTMLElement {}
+    customElements.define(TAG_NAME, SearchBoxElement);
+  }
+
   /* find the component’s root element even if the script was hoisted */
   const root =
     document.currentScript?.closest("[data-search-root]") ||
