@@ -1,6 +1,6 @@
 ---
 import SearchInput from "../components/SearchInput.astro";
---- 
+---
 
 <html>
   <head>
@@ -9,5 +9,10 @@ import SearchInput from "../components/SearchInput.astro";
   <body>
     <h1>Hello from ansearch-component!</h1>
     <SearchInput />
+
+    <!-- Load the web-component definition in the browser -->
+    <script type="module">
+      import "../components/SearchInputElement.ts";
+    </script>
   </body>
 </html>
