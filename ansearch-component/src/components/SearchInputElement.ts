@@ -12,25 +12,9 @@
  *   attach the shadow root manually to replicate the same markup.
  */
 class SearchInputElement extends HTMLElement {
-  connectedCallback() {
-    if (this.shadowRoot) return;
-
-    const template = this.querySelector<HTMLTemplateElement>(
-      "template[shadowrootmode]"
-    );
-
-    if (template) {
-      const mode = (template.getAttribute("shadowrootmode") ?? "open") as
-        | "open"
-        | "closed";
-
-      const shadow = this.attachShadow({ mode });
-      shadow.appendChild(template.content.cloneNode(true));
-
-      // optional: remove inert fallback template after cloning
-      template.remove();
-    }
-  }
+  /* The declarative Shadow DOM rendered by the server already
+     contains the final markup, so the custom element requires
+     no runtime work. */
 }
 
 if (!customElements.get("search-input")) {
