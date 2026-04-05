@@ -33,6 +33,47 @@ const PRODUCTS = [
   "Product F",
 ];
 
+function SearchSSR() {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function load() {
+      try {
+        const markup = await fetch("http://localhost:4321/").then((r) =>
+          r.text()
+        );
+
+        if (cancelled || !containerRef.current) return;
+        if (typeof (containerRef.current as any).setHTMLUnsafe === "function") {
+          (containerRef.current as any).setHTMLUnsafe(markup);
+        } else {
+          containerRef.current.innerHTML = markup;
+        }
+
+        /* load & register the <search-input> element so it becomes interactive */
+        try {
+          await import(
+            "http://localhost:4321/src/components/SearchInputElement.ts"
+          );
+        } catch (err) {
+          console.error(err);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  return <div ref={containerRef} />;
+}
+
 export default function HomeClient({
   userName,
   userEmail,
@@ -136,85 +177,7 @@ export default function HomeClient({
                 </button>
             )}
 
-            <div className="w-72 relative">
-              <input
-                value={query}
-                onChange={(e) => {
-                    setQuery(e.target.value);
-                    setOpen(true);
-                }}
-                onFocus={() => setOpen(true)}
-                onBlur={() => {
-                    setTimeout(() => setOpen(false), 120);
-                }}
-                placeholder="Search…"
-                className="w-full border rounded-md px-3 py-2 text-sm bg-white outline-none focus:ring-2 focus:ring-zinc-200"
-                />
-
-                {open && (loading || hasResults) && (
-                <div className="absolute mt-2 w-full rounded-md border bg-white shadow-lg overflow-hidden z-20">
-                    <div className="px-3 py-2 text-xs text-zinc-500 bg-zinc-50 border-b">
-                    {loading ? "Searching..." : "Suggestions"}
-                    </div>
-
-                    {!loading && (
-                    <div className="max-h-80 overflow-auto">
-                        {filtered.length > 0 && (
-                        <ul>
-                            {filtered.map((item) => (
-                            <li key={item}>
-                                <button
-                                type="button"
-                                className="w-full text-left px-3 py-2 text-sm hover:bg-zinc-100"
-                                onMouseDown={(e) => e.preventDefault()}
-                                onClick={() => {
-                                    setQuery(item);
-                                    setOpen(false);
-                                }}
-                                >
-                                {item}
-                                </button>
-                            </li>
-                            ))}
-                        </ul>
-                        )}
-
-                        {recentOrders.length > 0 && (
-                        <>
-                            <div className="border-t" />
-                            <div className="px-3 py-2 text-xs text-zinc-500 bg-zinc-50 border-b">
-                            Your latest orders
-                            </div>
-
-                            <ul>
-                            {recentOrders.map((order) => (
-                                <li key={order.id}>
-                                <button
-                                    type="button"
-                                    className="w-full text-left px-3 py-3 hover:bg-zinc-100"
-                                    onMouseDown={(e) => e.preventDefault()}
-                                    onClick={() => {
-                                    setQuery(order.title);
-                                    setOpen(false);
-                                    }}
-                                >
-                                    <div className="text-sm font-medium text-zinc-900">
-                                    {order.title}
-                                    </div>
-                                    <div className="text-xs text-zinc-500 mt-0.5">
-                                    {order.subtitle}
-                                    </div>
-                                </button>
-                                </li>
-                            ))}
-                            </ul>
-                        </>
-                        )}
-                    </div>
-                    )}
-                </div>
-                )}
-            </div>
+            <SearchSSR />
           </div>
         </div>
       </header>
