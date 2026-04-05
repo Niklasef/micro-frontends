@@ -1,13 +1,11 @@
 ---
+import styles from "../styles/tailwind.css?inline";
 ---
-<!--
-  A super-minimal Astro component that server-side renders a declarative
-  Shadow DOM (DSD) for <search-input>. Browsers that support DSD will
-  automatically attach the shadow-root. Others will be upgraded by the
-  runtime in SearchInputElement.ts.
--->
+
 <search-input>
   <template shadowrootmode="open">
+    <style set:html={styles}></style>
+
     <div class="w-72 relative" style="font-family: sans-serif;">
       <input
         type="search"
@@ -15,7 +13,6 @@
         class="w-full border rounded-md px-3 py-2 text-sm bg-white outline-none focus:ring-2 focus:ring-zinc-200"
       />
 
-      <!-- dropdown -->
       <div
         class="absolute mt-2 w-full rounded-md border bg-white shadow-lg overflow-hidden z-20 hidden"
         data-dropdown

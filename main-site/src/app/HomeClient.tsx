@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import { Session } from "next-auth";
 
@@ -21,7 +21,8 @@ type HomeClientProps = {
   userName: string | null;
   userEmail: string | null;
   isAuthenticated: boolean;
-  session: Session
+  session: Session;
+  children?: ReactNode;
 };
 
 const PRODUCTS = [
@@ -33,114 +34,15 @@ const PRODUCTS = [
   "Product F",
 ];
 
-function SearchSSR() {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function load() {
-      try {
-        const markup = await fetch("http://localhost:4321/").then((r) =>
-          r.text()
-        );
-
-        if (cancelled || !containerRef.current) return;
-        if (typeof (containerRef.current as any).setHTMLUnsafe === "function") {
-          (containerRef.current as any).setHTMLUnsafe(markup);
-        } else {
-          containerRef.current.innerHTML = markup;
-        }
-
-        /* load & register the <search-input> element so it becomes interactive */
-        try {
-          await import(
-            "http://localhost:4321/src/components/SearchInputElement.ts"
-          );
-        } catch (err) {
-          console.error(err);
-        }
-      } catch (err) {
-        console.error(err);
-      }
-    }
-
-    load();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  return <div ref={containerRef} />;
-}
 
 export default function HomeClient({
   userName,
   userEmail,
   isAuthenticated,
   session,
+  children,
 }: HomeClientProps) {
   // const { data: session } = useSession();
-
-  const [query, setQuery] = useState("");
-  const [open, setOpen] = useState(false);
-  const [filtered, setFiltered] = useState<Suggestion[]>([]);
-  const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([]);
-  const [loading, setLoading] = useState(false);
-
-  const abortRef = useRef<AbortController | null>(null);
-
-  useEffect(() => {
-    const q = query.trim();
-
-    if (!q) {
-      setFiltered([]);
-      setRecentOrders([]);
-      setLoading(false);
-      return;
-    }
-
-    const timer = setTimeout(async () => {
-      abortRef.current?.abort();
-      const controller = new AbortController();
-      abortRef.current = controller;
-
-      try {
-        setLoading(true);
-
-        const res = await fetch(
-          `/api/search-autocomplete?q=${encodeURIComponent(q)}`,
-          {
-            method: "GET",
-            signal: controller.signal,
-          }
-        );
-
-        if (!res.ok) {
-          throw new Error("Failed to fetch autocomplete results");
-        }
-
-        const data: SearchResponse = await res.json();
-
-        setFiltered(Array.isArray(data.suggestions) ? data.suggestions : []);
-        setRecentOrders(Array.isArray(data.recentOrders) ? data.recentOrders : []);
-      } catch (error: any) {
-        if (error.name !== "AbortError") {
-          console.error(error);
-          setFiltered([]);
-          setRecentOrders([]);
-        }
-      } finally {
-        setLoading(false);
-      }
-    }, 300);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [query]);
-
-  const hasResults = filtered.length > 0 || recentOrders.length > 0;
 
   return (
     <div className="min-h-screen bg-zinc-50 text-zinc-900 flex flex-col">
@@ -176,8 +78,7 @@ export default function HomeClient({
                 Login
                 </button>
             )}
-
-            <SearchSSR />
+            {children}
           </div>
         </div>
       </header>

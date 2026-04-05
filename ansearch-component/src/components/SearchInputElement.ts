@@ -1,4 +1,4 @@
-import styles from "../styles/tailwind.css?inline";
+// import styles from "../styles/tailwind.css?inline";
 
 /**
  * Definition of the <search-input> custom element that works
@@ -26,12 +26,12 @@ class SearchInputElement extends HTMLElement {
     }
 
     /* Inject Tailwind utilities once per element */
-    if (shadow && !shadow.querySelector("style[data-tailwind]")) {
-      const styleTag = document.createElement("style");
-      styleTag.textContent = styles;
-      styleTag.setAttribute("data-tailwind", "");
-      shadow.prepend(styleTag);
-    }
+    // if (shadow && !shadow.querySelector("style[data-tailwind]")) {
+    //   const styleTag = document.createElement("style");
+    //   styleTag.textContent = styles;
+    //   styleTag.setAttribute("data-tailwind", "");
+    //   shadow.prepend(styleTag);
+    // }
 
     /* --- interactive autocomplete logic --- */
     const input = shadow.querySelector("input") as HTMLInputElement | null;
@@ -184,3 +184,4 @@ class SearchInputElement extends HTMLElement {
 if (!customElements.get("search-input")) {
   customElements.define("search-input", SearchInputElement);
 }
+
