@@ -26,7 +26,6 @@ export default function RootLayout({
   return (
     <html lang="en">
           <head>
-            <Script src="http://localhost:4173/index.js" strategy="beforeInteractive" />
           </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
