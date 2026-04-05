@@ -2,17 +2,10 @@
 import SearchInput from "../components/SearchInput.astro";
 ---
 
-<html>
-  <head>
-    <title>ansearch Astro App</title>
-  </head>
-  <body>
-    <h1>Hello from ansearch-component!</h1>
-    <SearchInput />
+<!-- Minimal endpoint that only renders the custom element markup -->
+<SearchInput />
 
-    <!-- Load the web-component definition in the browser -->
-    <script type="module">
-      import "../components/SearchInputElement.ts";
-    </script>
-  </body>
-</html>
+<!-- Load the web-component definition -->
+<script type="module">
+  import "../components/SearchInputElement.ts";
+</script>
