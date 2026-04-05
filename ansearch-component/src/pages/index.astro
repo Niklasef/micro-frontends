@@ -2,10 +2,6 @@
 import SearchInput from "../components/SearchInput.astro";
 ---
 
-<!-- Minimal endpoint that only renders the custom element markup -->
 <SearchInput />
 
-<!-- Load the web-component definition -->
-<script type="module">
-  import "../components/SearchInputElement.ts";
-</script>
+<script src="../components/SearchInputElement.ts"></script>
