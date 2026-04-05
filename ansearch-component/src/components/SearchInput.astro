@@ -8,10 +8,26 @@
 -->
 <search-input>
   <template shadowrootmode="open">
-    <input
-      type="search"
-      placeholder="Search..."
-      class="w-full border rounded-md px-3 py-2 text-sm bg-white outline-none focus:ring-2 focus:ring-zinc-200"
-    />
+    <div class="w-72 relative" style="font-family: sans-serif;">
+      <input
+        type="search"
+        placeholder="Search…"
+        class="w-full border rounded-md px-3 py-2 text-sm bg-white outline-none focus:ring-2 focus:ring-zinc-200"
+      />
+
+      <!-- dropdown -->
+      <div
+        class="absolute mt-2 w-full rounded-md border bg-white shadow-lg overflow-hidden z-20 hidden"
+        data-dropdown
+      >
+        <div
+          class="px-3 py-2 text-xs text-zinc-500 bg-zinc-50 border-b"
+          data-status
+        >
+          Suggestions
+        </div>
+        <div class="max-h-80 overflow-auto" data-results></div>
+      </div>
+    </div>
   </template>
 </search-input>
