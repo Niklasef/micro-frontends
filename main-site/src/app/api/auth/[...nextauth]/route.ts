@@ -17,6 +17,23 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
+  callbacks: {
+    async jwt({ token, account }) {
+      if (account) {
+        (token as any).access_token = (account as any).access_token;
+        (token as any).refresh_token = (account as any).refresh_token;
+        (token as any).id_token = (account as any).id_token;
+        (token as any).expires_at = (account as any).expires_at;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      (session as any).access_token = (token as any).access_token ?? null;
+      (session as any).id_token = (token as any).id_token ?? null;
+      (session as any).expires_at = (token as any).expires_at ?? null;
+      return session;
+    },
+  },
   /* Make all Next-Auth cookies available on every sub-domain so that
      requests sent from e.g. search.furmountain.local can include the
      session & state cookies set on furmountain.local. */
