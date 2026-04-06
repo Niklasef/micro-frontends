@@ -17,6 +17,59 @@ export const authOptions: NextAuthOptions = {
   session: {
     strategy: "jwt",
   },
+  /* Make all Next-Auth cookies available on every sub-domain so that
+     requests sent from e.g. search.furmountain.local can include the
+     session & state cookies set on furmountain.local. */
+  cookies: {
+    sessionToken: {
+      name: "next-auth.session-token",
+      options: {
+        path: "/",
+        domain: ".furmountain.local",
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
+    callbackUrl: {
+      name: "next-auth.callback-url",
+      options: {
+        path: "/",
+        domain: ".furmountain.local",
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
+    csrfToken: {
+      name: "next-auth.csrf-token",
+      options: {
+        path: "/",
+        domain: ".furmountain.local",
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
+    pkceCodeVerifier: {
+      name: "next-auth.pkce.code_verifier",
+      options: {
+        path: "/",
+        domain: ".furmountain.local",
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
+    state: {
+      name: "next-auth.state",
+      options: {
+        path: "/",
+        domain: ".furmountain.local",
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+      },
+    },
+  },
   secret: process.env.NEXTAUTH_SECRET || "development_secret",
 };
 

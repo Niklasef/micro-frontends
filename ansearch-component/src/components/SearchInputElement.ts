@@ -127,8 +127,8 @@ class SearchInputElement extends HTMLElement {
 
       try {
         const res = await fetch(
-          `http://localhost:3001/search-autocomplete?q=${encodeURIComponent(q)}`,
-          { signal: controller.signal }
+          `http://search.furmountain.local:3001/search-autocomplete?q=${encodeURIComponent(q)}`,
+          { signal: controller.signal, credentials: "include" }
         );
         if (!res.ok) throw new Error("Request failed");
         const data = await res.json();
