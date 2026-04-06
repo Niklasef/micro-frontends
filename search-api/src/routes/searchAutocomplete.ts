@@ -173,33 +173,6 @@ const searchAutocompleteRoute: FastifyPluginAsync = async (fastify) => {
       fastify.log.info("next-auth.session-token cookie not present on request");
     }
 
-    const authHeader = request.headers.authorization;
-
-    if (!authHeader) {
-      fastify.log.info("No Authorization header supplied");
-    }
-
-    if (authHeader?.startsWith("Bearer ")) {
-      const token = authHeader.slice("Bearer ".length);
-      fastify.log.info({ token }, "Received bearer token");
-
-      try {
-        const payload = await verifyToken(token);
-        const nik = isNiklasFromToken(payload as any);
-        if (nik.ok) {
-          fastify.log.info({ sub: payload.sub, exp: payload.exp, via: nik.via }, "Token verified successfully for user 'niklas'");
-          recentOrders = MOCK_RECENT_ORDERS.filter((order) =>
-            order.title.toLowerCase().includes(q),
-          ).slice(0, 3);
-        } else {
-          fastify.log.info({ sub: payload.sub, exp: payload.exp }, "Token verified but user is not 'niklas'; omitting personalized results");
-        }
-      } catch (err) {
-        fastify.log.warn({ err }, "Token verification failed");
-        // invalid / expired token – treat as unauthenticated
-      }
-    }
-
     fastify.log.info({ suggestionsCount: suggestions.length, recentOrdersCount: recentOrders.length }, "Sending /search-autocomplete response");
     return reply.send({ suggestions, recentOrders });
   });
