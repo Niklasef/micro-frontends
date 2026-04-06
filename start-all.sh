@@ -27,6 +27,23 @@ wait_for_http() {
 }
 
 ###############################################################################
+# Helper: ensure that a hostname resolves to 127.0.0.1 in /etc/hosts
+###############################################################################
+ensure_host_entry() {
+  local host="$1"
+  if ! grep -qE "^[[:space:]]*127\.0\.0\.1[[:space:]]+$host(\\s|$)" /etc/hosts; then
+    echo "▶ Adding $host → 127.0.0.1 to /etc/hosts (requires sudo)"
+    echo "127.0.0.1 $host" | sudo tee -a /etc/hosts >/dev/null
+  fi
+}
+
+###############################################################################
+# Ensure dev hostnames resolve locally
+###############################################################################
+ensure_host_entry "furmountain.local"
+ensure_host_entry "search.furmountain.local"
+
+###############################################################################
 # 1. Keycloak
 ###############################################################################
 echo "▶ Starting Keycloak …"
