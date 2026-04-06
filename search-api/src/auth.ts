@@ -1,4 +1,4 @@
-import { jwtVerify, createRemoteJWKSet, type JWTPayload, decodeProtectedHeader } from "jose";
+import { jwtVerify, createRemoteJWKSet, type JWTPayload } from "jose";
 import { URL } from "node:url";
 
 const issuer = process.env.KEYCLOAK_ISSUER!;
@@ -10,27 +10,8 @@ export async function verifyToken<T extends JWTPayload = JWTPayload>(token: stri
     const { payload } = await jwtVerify<T>(token, JWKS, { issuer });
     return payload;
   } catch (primaryErr) {
-    // 2) If that fails, check if it's an HMAC-signed token (HS*) and verify with the client secret
-    try {
-      const { alg } = decodeProtectedHeader(token);
-      if (alg && alg.startsWith("HS")) {
-        const hmacSecret =
-          process.env.KEYCLOAK_CLIENT_SECRET ||
-          process.env.AUTH_KEYCLOAK_SECRET;
 
-        if (!hmacSecret) {
-          throw primaryErr;
-        }
-
-        const key = new TextEncoder().encode(hmacSecret);
-        const { payload } = await jwtVerify<T>(token, key, { issuer });
-        return payload;
-      }
-    } catch {
-      // fall through to introspection
-    }
-
-    // 3) Fallback to OAuth2 Token Introspection (works for opaque tokens too)
+    // Fallback to OAuth2 Token Introspection (works for opaque tokens too)
     const clientId =
       process.env.KEYCLOAK_CLIENT_ID || process.env.AUTH_KEYCLOAK_ID || "main-site";
     const clientSecret =

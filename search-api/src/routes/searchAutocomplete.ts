@@ -62,6 +62,14 @@ function getChunkedCookieValue(
   return { value, chunks: sorted };
 }
 
+function isNiklasFromToken(payload: Record<string, any>): { ok: boolean; via?: string } {
+  if (!payload) return { ok: false };
+  if ((payload as any).preferred_username === "niklas") return { ok: true, via: "preferred_username" };
+  if ((payload as any).username === "niklas") return { ok: true, via: "username" };
+  if ((payload as any).name === "niklas") return { ok: true, via: "name" };
+  return { ok: false };
+}
+
 async function decodeNextAuthJWT(token: string, secret: string): Promise<Record<string, any> | null> {
   try {
     // Use NextAuth's decoder which handles both encrypted (JWE) and signed (JWS) tokens
@@ -143,11 +151,15 @@ const searchAutocompleteRoute: FastifyPluginAsync = async (fastify) => {
           );
           try {
             const providerPayload = await verifyToken(accessToken);
-            fastify.log.info({ sub: providerPayload.sub, exp: providerPayload.exp }, "Token from NextAuth session verified successfully");
-
-            recentOrders = MOCK_RECENT_ORDERS.filter((order) =>
-              order.title.toLowerCase().includes(q),
-            ).slice(0, 3);
+            const nik = isNiklasFromToken(providerPayload as any);
+            if (nik.ok) {
+              fastify.log.info({ sub: providerPayload.sub, exp: providerPayload.exp, via: nik.via }, "Token from NextAuth session verified successfully for user 'niklas'");
+              recentOrders = MOCK_RECENT_ORDERS.filter((order) =>
+                order.title.toLowerCase().includes(q),
+              ).slice(0, 3);
+            } else {
+              fastify.log.info({ sub: providerPayload.sub, exp: providerPayload.exp }, "Token verified but user is not 'niklas'; omitting personalized results");
+            }
           } catch (err) {
             fastify.log.warn({ err }, "Access token from NextAuth session failed verification");
           }
@@ -173,11 +185,15 @@ const searchAutocompleteRoute: FastifyPluginAsync = async (fastify) => {
 
       try {
         const payload = await verifyToken(token);
-        fastify.log.info({ sub: payload.sub, exp: payload.exp }, "Token verified successfully");
-
-        recentOrders = MOCK_RECENT_ORDERS.filter((order) =>
-          order.title.toLowerCase().includes(q),
-        ).slice(0, 3);
+        const nik = isNiklasFromToken(payload as any);
+        if (nik.ok) {
+          fastify.log.info({ sub: payload.sub, exp: payload.exp, via: nik.via }, "Token verified successfully for user 'niklas'");
+          recentOrders = MOCK_RECENT_ORDERS.filter((order) =>
+            order.title.toLowerCase().includes(q),
+          ).slice(0, 3);
+        } else {
+          fastify.log.info({ sub: payload.sub, exp: payload.exp }, "Token verified but user is not 'niklas'; omitting personalized results");
+        }
       } catch (err) {
         fastify.log.warn({ err }, "Token verification failed");
         // invalid / expired token – treat as unauthenticated
