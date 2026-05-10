@@ -673,17 +673,19 @@
       "clientId": "main-site",
       "name": "main-site",
       "description": "",
-      "rootUrl": "http://localhost:3000",
-      "adminUrl": "http://localhost:3000",
-      "baseUrl": "http://localhost:3000",
+      "rootUrl": "http://furmountain.local:3000",
+      "adminUrl": "http://furmountain.local:3000",
+      "baseUrl": "http://furmountain.local:3000",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "redirectUris": [
+        "http://furmountain.local:3000/*",
         "http://localhost:3000/*"
       ],
       "webOrigins": [
+        "http://furmountain.local:3000/*",
         "http://localhost:3000"
       ],
       "notBefore": 0,
@@ -702,7 +704,7 @@
         "oidc.ciba.grant.enabled": "false",
         "backchannel.logout.session.required": "true",
         "standard.token.exchange.enabled": "false",
-        "post.logout.redirect.uris": "http://localhost:3000/*",
+        "post.logout.redirect.uris": "http://furmountain.local:3000/* http://localhost:3000/*",
         "frontchannel.logout.session.required": "true",
         "oauth2.device.authorization.grant.enabled": "false",
         "display.on.consent.screen": "false",
