@@ -56,24 +56,24 @@ wait_for_http "http://localhost:8080/realms/master/.well-known/openid-configurat
 ###############################################################################
 # 2. search-api
 ###############################################################################
-# echo "▶ Starting search-api …"
-# (
-#   cd search-api
-#   npm install
-#   npm run dev
-# ) &
-# SEARCH_API_PID=$!
+echo "▶ Starting search-api …"
+(
+  cd search-api
+  npm install
+  npm run dev
+) &
+SEARCH_API_PID=$!
 
 ###############################################################################
-# 3. ansearch-component (Astro preview)
+# 3. ansearch-component
 ###############################################################################
-# echo "▶ Building & starting ansearch-component …"
-# (
-#   cd ansearch-component
-#   npm run build
-#   npm run preview
-# ) &
-# ANSEARCH_PID=$!
+echo "▶ Building & starting search-component …"
+(
+  cd search-component
+  npm run build
+  npm run preview
+) &
+ANSEARCH_PID=$!
 
 ###############################################################################
 # 4. main-site
