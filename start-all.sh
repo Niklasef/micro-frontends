@@ -70,6 +70,7 @@ SEARCH_API_PID=$!
 echo "▶ Building & starting search-component …"
 (
   cd search-component
+  npm install
   npm run build
   npm run preview
 ) &
