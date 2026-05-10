@@ -59,6 +59,7 @@ wait_for_http "http://localhost:8080/realms/master/.well-known/openid-configurat
 echo "▶ Starting search-api …"
 (
   cd search-api
+  npm install
   npm run dev
 ) &
 SEARCH_API_PID=$!
@@ -69,6 +70,7 @@ SEARCH_API_PID=$!
 echo "▶ Building & starting ansearch-component …"
 (
   cd ansearch-component
+  npm install
   npm run build
   npm run preview
 ) &
@@ -80,6 +82,7 @@ ANSEARCH_PID=$!
 echo "▶ Starting main-site …"
 (
   cd main-site
+  npm install
   npm run dev
 ) &
 MAIN_SITE_PID=$!
