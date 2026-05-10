@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
-import { authOptions } from "../auth/[...nextauth]/route";
+import { authOptions } from "@/lib/auth-options";
 
 const ALL_ITEMS = [
   "Product A",
@@ -36,6 +36,13 @@ const MOCK_RECENT_ORDERS = [
 
 export async function GET(req: NextRequest) {
   const q = req.nextUrl.searchParams.get("q")?.trim().toLowerCase() || "";
+  console.log(
+    "[api/search-autocomplete] host=%s url=%s q=%s enableSession=%s",
+    req.headers.get("host"),
+    req.nextUrl.toString(),
+    q,
+    process.env.FM_ENABLE_AUTOCOMPLETE_SESSION === "1"
+  );
 
   if (!q) {
     return NextResponse.json({
