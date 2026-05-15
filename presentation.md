@@ -1,6 +1,10 @@
+# intro
+- resa genom teamorganisering med hjälp av micro frontends
+
 # main
+- fiktiv site
 - personifierad sök
-- oauth flöde för aktorisering
+- oauth flöde för auktorisering
 - sök inbyggd i platform site
 - utmaning: sök ska bli eget team och finnas på många platformar
 
@@ -14,7 +18,7 @@
 - shadow dom isolerar, skyddar mot css krockar
 - utmaning: extra hopp till proxy, run time beroende, fördröjd initial rendering
 
-# feature/astro-ssr-web-component
+# feature/astro-ssr-web-component (exploration)
 - custom element Astro SSR (ingen fördröjd initial rendering)
 - anrop direkt från browser till sök api via subdoman och delad server kaka (ingen proxy i mellan)
 - utmaning:
