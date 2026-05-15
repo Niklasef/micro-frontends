@@ -2,6 +2,7 @@
 
 import { signIn, signOut } from "next-auth/react";
 import { Session } from "next-auth";
+import { useEffect, useState } from "react";
 
 
 type HomeClientProps = {
@@ -26,6 +27,12 @@ export default function HomeClient({
   isAuthenticated,
   session,
 }: HomeClientProps) {
+
+  const [showSearch, setShowSearch] = useState(false);
+
+  useEffect(() => {
+    setShowSearch(true);
+  }, []);
 
   return (
     <div className="min-h-screen bg-zinc-50 text-zinc-900 flex flex-col">
@@ -62,7 +69,7 @@ export default function HomeClient({
                 </button>
             )}
 
-            <search-component className="w-72 block" />
+            {showSearch && <search-component className="w-72 block" />}
           </div>
         </div>
       </header>
